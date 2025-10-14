@@ -1,0 +1,16 @@
+{
+  "current_age": 30.0,
+  "D": 90.0,
+  "W0": 500000.0,
+  "x0_monthly": 8000.0,
+  "alpha_annual": 0.01,
+  "retire_age": 65.0,
+  "x_post_monthly": 0.0,
+  "beta_annual": 0.05,
+  "y_monthly": 3000.0,
+  "gamma_pre": 0.0,
+  "gamma_post": null,
+  "L_pre": 1.0,
+  "L_post": 1.7,
+  "months_per_year": 12
+}
