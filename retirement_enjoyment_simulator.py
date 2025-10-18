@@ -39,7 +39,6 @@ def simulate_with_retirement(
     monthly_spending: float,
     utility_exponent_pre_retire: float,  # 0 -> log utility; else power utility with exponent utility_exponent_pre_retire
     utility_exponent_post_retire: Optional[float],
-    utility_multiplier_pre_retire: float,
     utility_multiplier_post_retire: float,
 ) -> Dict[str, float]:
     """
@@ -64,7 +63,7 @@ def simulate_with_retirement(
             gamma_now = utility_exponent_post_retire if utility_exponent_post_retire is not None else utility_exponent_pre_retire
         else:
             x_month_now = x_month
-            L_now = utility_multiplier_pre_retire
+            L_now = 1.0
             gamma_now = utility_exponent_pre_retire
 
         # linear age factor that declines to zero at final_age
@@ -183,7 +182,6 @@ if __name__ == "__main__":
         "investment_annual_growth": config["investment_annual_growth"],
         "utility_exponent_pre_retire": config["utility_exponent_pre_retire"],
         "utility_exponent_post_retire": config["utility_exponent_post_retire"],
-        "utility_multiplier_pre_retire": config["utility_multiplier_pre_retire"],
         "utility_multiplier_post_retire": config["utility_multiplier_post_retire"],
     }
 

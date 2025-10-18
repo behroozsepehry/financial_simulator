@@ -8,7 +8,6 @@
   "investment_annual_growth": 0.03,
   "utility_exponent_pre_retire": 0.0,
   "utility_exponent_post_retire": null,
-  "utility_multiplier_pre_retire": 1.0,
   "utility_multiplier_post_retire": 1.5,
   "monthly_spending_min": 100,
   "monthly_spending_max": 10000,
