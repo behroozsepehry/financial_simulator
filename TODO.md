@@ -7,7 +7,7 @@ This TODO aggregates the model refinements and experiments discussed during the 
 ## High priority (most impactful)
 
 1. **Monte Carlo returns + ruin probability analysis**
-   - Replace deterministic `beta` with stochastic returns (e.g., annual lognormal shocks) and run many simulations (e.g., 5k–50k).
+   - Replace deterministic `investment_annual_growth` with stochastic returns (e.g., annual lognormal shocks) and run many simulations (e.g., 5k–50k).
    - Compute `P(ruin)` = probability wealth hits zero before death, and the distribution of terminal wealth.
    - For each (retire_age, spending) policy, estimate ruin probability and choose policies with `P(ruin) ≤ p*` (user-specified, e.g., 1% or 5%).
    - Rationale: sequence-of-returns risk is critical for early retirement scenarios.
@@ -18,7 +18,7 @@ This TODO aggregates the model refinements and experiments discussed during the 
    - Rationale: many people derive happiness from work; omitting it biases model toward retirement.
 
 3. **Dynamic spending / time-sensitive consumption**
-   - Split spending into `experience` vs `goods`. Model `experience` utility to be amplified by `L_post` and possibly front-loaded.
+   - Split spending into `experience` vs `goods`. Model `experience` utility to be amplified by `utility_multiplier_post_retire` and possibly front-loaded.
    - Allow time-varying spending policies (e.g., higher early-retirement spending for travel).
    - Rationale: concentrating experience spending when young/healthy increases utility without necessarily increasing ruin risk as much as constant high spending.
 
@@ -46,11 +46,11 @@ This TODO aggregates the model refinements and experiments discussed during the 
 ## Lower priority / niceties
 
 8. **Sensitivity & robustness analysis**
-   - Sweep α, β, L_post, γ, lifespan, and show contours of feasible spending and ruin probability.
+   - Sweep income_annual_growth, investment_annual_growth, utility_multiplier_post_retire, utility_exponent_pre_retire, final_age, and show contours of feasible spending and ruin probability.
    - Compute regret-minimizing policies under parameter uncertainty.
 
 9. **Refine leisure mapping**
-   - Replace scalar `L_post` with a calibrated function `L(t)` of discretionary hours (concave / capped). Calibrate using literature heuristics.
+   - Replace scalar `utility_multiplier_post_retire` with a calibrated function `L(t)` of discretionary hours (concave / capped). Calibrate using literature heuristics.
 
 10. **Add discounting and time preference**
     - Allow discount factor or time preference in utility aggregation.
@@ -80,4 +80,3 @@ This TODO aggregates the model refinements and experiments discussed during the 
 1. Implement Monte Carlo returns + ruin probability and produce a table of max spending by age for a chosen acceptable ruin probability (e.g., 5%).
 2. Add a simple `work_utility` parameter and re-run the deterministic sweep to inspect how retirement recommendations change.
 3. Implement dynamic spending (split experience vs goods) and test front-loading experience spending early in retirement.
-

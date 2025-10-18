@@ -9,14 +9,19 @@ This project models lifetime utility ("enjoyment") as a function of constant mon
 - `TODO.md` — prioritized list of improvements and experiments.
 
 ## Key assumptions (defaults)
-- Current age: **30**
-- Planning horizon (death age D): **90**
-- Starting investible wealth W0: **500,000 CAD**
-- Monthly after-tax salary: **8,000 CAD** (starting)
-- Salary growth (real): **1%/yr**
-- Investment return (real): **5%/yr**
-- Utility from spending: **log(y)** (monthly), multiplied by an age factor that declines linearly to zero at D
-- Leisure multiplier after retirement: **L_post = 1.7** (per-dollar enjoyment is 70% higher in retirement)
+- Initial age: **30**
+- Final age: **90**
+- Initial wealth: **500,000 CAD**
+- Initial monthly income: **8,000 CAD**
+- Income annual growth (real): **1%/yr**
+- Retired monthly income: **0**
+- Investment annual growth (real): **5%/yr**
+- Monthly spending: **3000**
+- Utility exponent pre-retire: **0.0** (log utility)
+- Utility exponent post-retire: **null** (same as pre)
+- Utility multiplier pre-retire: **1.0**
+- Utility multiplier post-retire: **1.7** (leisure multiplier after retirement, per-dollar enjoyment is 70% higher)
+- Months per year: **12**
 
 These defaults can be modified by editing the script or importing functions into your own code.
 

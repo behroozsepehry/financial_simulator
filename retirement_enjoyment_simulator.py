@@ -26,19 +26,19 @@ from typing import Optional, Tuple, Dict
 
 
 def simulate_with_retirement(
-    current_age: float,
-    D: float,
-    W0: float,
-    x0_monthly: float,
-    alpha_annual: float,
+    initial_age: float,
+    final_age: float,
+    initial_wealth: float,
+    initial_monthly_income: float,
+    income_annual_growth: float,
     retire_age: float,
-    x_post_monthly: float,
-    beta_annual: float,
-    y_monthly: float,
-    gamma_pre: float = 0.0,  # 0 -> log utility; else power utility with exponent gamma_pre
-    gamma_post: Optional[float] = None,
-    L_pre: float = 1.0,
-    L_post: float = 1.7,
+    retired_monthly_income: float,
+    investment_annual_growth: float,
+    monthly_spending: float,
+    utility_exponent_pre_retire: float = 0.0,  # 0 -> log utility; else power utility with exponent utility_exponent_pre_retire
+    utility_exponent_post_retire: Optional[float] = None,
+    utility_multiplier_pre_retire: float = 1.0,
+    utility_multiplier_post_retire: float = 1.7,
     months_per_year: int = 12,
 ) -> Dict[str, float]:
     """
@@ -46,39 +46,39 @@ def simulate_with_retirement(
 
     Returns a dict with keys: total_enjoyment, final_wealth, bankrupt (bool).
     """
-    months = int((D - current_age) * months_per_year)
+    months = int((final_age - initial_age) * months_per_year)
     # monthly rate equivalents
-    alpha_m = (1 + alpha_annual) ** (1 / months_per_year) - 1
-    beta_m = (1 + beta_annual) ** (1 / months_per_year) - 1
+    alpha_m = (1 + income_annual_growth) ** (1 / months_per_year) - 1
+    beta_m = (1 + investment_annual_growth) ** (1 / months_per_year) - 1
 
-    age = current_age
-    W = W0
-    x_month = x0_monthly
+    age = initial_age
+    W = initial_wealth
+    x_month = initial_monthly_income
     total_enjoyment = 0.0
 
     for _ in range(months):
         if age >= retire_age:
-            x_month_now = x_post_monthly
-            L_now = L_post
-            gamma_now = gamma_post if gamma_post is not None else gamma_pre
+            x_month_now = retired_monthly_income
+            L_now = utility_multiplier_post_retire
+            gamma_now = utility_exponent_post_retire if utility_exponent_post_retire is not None else utility_exponent_pre_retire
         else:
             x_month_now = x_month
-            L_now = L_pre
-            gamma_now = gamma_pre
+            L_now = utility_multiplier_pre_retire
+            gamma_now = utility_exponent_pre_retire
 
-        # linear age factor that declines to zero at D
-        age_factor = max(0.0, 1.0 - (age - current_age) / (D - current_age))
+        # linear age factor that declines to zero at final_age
+        age_factor = max(0.0, 1.0 - (age - initial_age) / (final_age - initial_age))
 
         # utility from spending (monthly)
         if gamma_now == 0:
-            monthly_utility = math.log(max(y_monthly, 1.0)) * age_factor * L_now
+            monthly_utility = math.log(max(monthly_spending, 1.0)) * age_factor * L_now
         else:
-            monthly_utility = (y_monthly**gamma_now) * age_factor * L_now
+            monthly_utility = (monthly_spending**gamma_now) * age_factor * L_now
 
         total_enjoyment += monthly_utility
 
         # wealth update
-        W = W * (1 + beta_m) + (x_month_now - y_monthly)
+        W = W * (1 + beta_m) + (x_month_now - monthly_spending)
 
         # step forward
         age += 1.0 / months_per_year
@@ -98,7 +98,7 @@ def max_feasible_spending_for_retire_age(
 ) -> Tuple[Optional[float], Optional[float], Optional[float]]:
     """
     Find the largest spending on a discretized grid [spend_min, spend_max] with step
-    `step` such that simulate_with_retirement(..., y_monthly=spend) yields final_wealth >= 0.
+    `step` such that simulate_with_retirement(..., monthly_spending=spend) yields final_wealth >= 0.
 
     Uses Python's bisect on the boolean feasibility vector.
 
@@ -108,7 +108,7 @@ def max_feasible_spending_for_retire_age(
     spend_range = range(spend_min, spend_max + step, step)
 
     def is_not_feasible(y: int) -> bool:
-        res = simulate_with_retirement(retire_age=retire_age, y_monthly=y, **sim_kwargs)
+        res = simulate_with_retirement(retire_age=retire_age, monthly_spending=y, **sim_kwargs)
         return res["final_wealth"] < 0
 
     idx_first_infeas = bisect.bisect_left(spend_range, True, key=is_not_feasible)
@@ -124,7 +124,7 @@ def max_feasible_spending_for_retire_age(
     best_s = spend_range.start + best_s_index * spend_range.step
 
     best_res = simulate_with_retirement(
-        retire_age=retire_age, y_monthly=best_s, **sim_kwargs
+        retire_age=retire_age, monthly_spending=best_s, **sim_kwargs
     )
     return best_s, best_res["total_enjoyment"], best_res["final_wealth"]
 
@@ -169,20 +169,20 @@ if __name__ == "__main__":
     with open("config.json", "r") as f:
         config = json.load(f)
 
-    # Default run: ages 34..45, step = 100 CAD, beta=5%, alpha=1%, L_post=1.7
+    # Default run: ages 34..45, step = 100 CAD, investment_annual_growth=5%, income_annual_growth=1%, utility_multiplier_post_retire=1.7
     ages = list(range(34, 46))
     sim_kwargs = {
-        "current_age": config["current_age"],
-        "D": config["D"],
-        "W0": config["W0"],
-        "x0_monthly": config["x0_monthly"],
-        "alpha_annual": config["alpha_annual"],
-        "x_post_monthly": config["x_post_monthly"],
-        "beta_annual": config["beta_annual"],
-        "gamma_pre": config["gamma_pre"],
-        "gamma_post": config["gamma_post"],
-        "L_pre": config["L_pre"],
-        "L_post": config["L_post"],
+        "initial_age": config["initial_age"],
+        "final_age": config["final_age"],
+        "initial_wealth": config["initial_wealth"],
+        "initial_monthly_income": config["initial_monthly_income"],
+        "income_annual_growth": config["income_annual_growth"],
+        "retired_monthly_income": config["retired_monthly_income"],
+        "investment_annual_growth": config["investment_annual_growth"],
+        "utility_exponent_pre_retire": config["utility_exponent_pre_retire"],
+        "utility_exponent_post_retire": config["utility_exponent_post_retire"],
+        "utility_multiplier_pre_retire": config["utility_multiplier_pre_retire"],
+        "utility_multiplier_post_retire": config["utility_multiplier_post_retire"],
         "months_per_year": config["months_per_year"],
     }
 
