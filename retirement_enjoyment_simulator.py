@@ -105,24 +105,23 @@ def max_feasible_spending_for_retire_age(
     Returns (best_spend, total_enjoyment, final_wealth) or (None, None, None) if no
     feasible spend in the grid.
     """
-    spends = list(np.arange(spend_min, spend_max + step, step))
+    spend_range = range(spend_min, spend_max + step, step)
 
-    feas = []
-    for s in spends:
-        res = simulate_with_retirement(retire_age=retire_age, y_monthly=s, **sim_kwargs)
-        feas.append(res["final_wealth"] >= 0)
+    def is_not_feasible(y: int) -> bool:
+        res = simulate_with_retirement(retire_age=retire_age, y_monthly=y, **sim_kwargs)
+        return res["final_wealth"] < 0
 
-    # Expect feas: [True, True, ..., True, False, False, ...]
-    not_feas = [not f for f in feas]
-    idx_first_infeas = bisect.bisect_left(not_feas, True)
+    idx_first_infeas = bisect.bisect_left(spend_range, True, key=is_not_feasible)
 
     if idx_first_infeas == 0:
         # smallest spending already infeasible
         return None, None, None
-    if idx_first_infeas >= len(spends):
-        best_s = spends[-1]
+    if idx_first_infeas >= len(spend_range):
+        best_s_index = len(spend_range) - 1
     else:
-        best_s = spends[idx_first_infeas - 1]
+        best_s_index = idx_first_infeas - 1
+
+    best_s = spend_range.start + best_s_index * spend_range.step
 
     best_res = simulate_with_retirement(
         retire_age=retire_age, y_monthly=best_s, **sim_kwargs
