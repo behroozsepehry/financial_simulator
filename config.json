@@ -11,6 +11,5 @@
   "utility_exponent_pre_retire": 0.0,
   "utility_exponent_post_retire": null,
   "utility_multiplier_pre_retire": 1.0,
-  "utility_multiplier_post_retire": 1.7,
-  "months_per_year": 12
+  "utility_multiplier_post_retire": 1.7
 }

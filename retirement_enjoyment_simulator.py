@@ -24,6 +24,8 @@ import pandas as pd
 import json
 from typing import Optional, Tuple, Dict
 
+MONTHS_PER_YEAR = 12
+
 
 def simulate_with_retirement(
     initial_age: float,
@@ -39,17 +41,16 @@ def simulate_with_retirement(
     utility_exponent_post_retire: Optional[float] = None,
     utility_multiplier_pre_retire: float = 1.0,
     utility_multiplier_post_retire: float = 1.7,
-    months_per_year: int = 12,
 ) -> Dict[str, float]:
     """
     Deterministic monthly simulation.
 
     Returns a dict with keys: total_enjoyment, final_wealth, bankrupt (bool).
     """
-    months = int((final_age - initial_age) * months_per_year)
+    months = int((final_age - initial_age) * MONTHS_PER_YEAR)
     # monthly rate equivalents
-    alpha_m = (1 + income_annual_growth) ** (1 / months_per_year) - 1
-    beta_m = (1 + investment_annual_growth) ** (1 / months_per_year) - 1
+    alpha_m = (1 + income_annual_growth) ** (1 / MONTHS_PER_YEAR) - 1
+    beta_m = (1 + investment_annual_growth) ** (1 / MONTHS_PER_YEAR) - 1
 
     age = initial_age
     W = initial_wealth
@@ -81,7 +82,7 @@ def simulate_with_retirement(
         W = W * (1 + beta_m) + (x_month_now - monthly_spending)
 
         # step forward
-        age += 1.0 / months_per_year
+        age += 1.0 / MONTHS_PER_YEAR
         if age < retire_age:
             x_month *= 1 + alpha_m
 
@@ -183,7 +184,6 @@ if __name__ == "__main__":
         "utility_exponent_post_retire": config["utility_exponent_post_retire"],
         "utility_multiplier_pre_retire": config["utility_multiplier_pre_retire"],
         "utility_multiplier_post_retire": config["utility_multiplier_post_retire"],
-        "months_per_year": config["months_per_year"],
     }
 
     df = run_grid_ages(

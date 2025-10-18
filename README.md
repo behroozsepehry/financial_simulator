@@ -21,7 +21,6 @@ This project models lifetime utility ("enjoyment") as a function of constant mon
 - Utility exponent post-retire: **null** (same as pre)
 - Utility multiplier pre-retire: **1.0**
 - Utility multiplier post-retire: **1.7** (leisure multiplier after retirement, per-dollar enjoyment is 70% higher)
-- Months per year: **12**
 
 These defaults can be modified by editing the script or importing functions into your own code.
 
