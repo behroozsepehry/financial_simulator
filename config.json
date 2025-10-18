@@ -6,12 +6,10 @@
   "income_annual_growth": 0.01,
   "retired_monthly_income": 0.0,
   "investment_annual_growth": 0.05,
-  "monthly_spending": 3000.0,
   "utility_exponent_pre_retire": 0.0,
   "utility_exponent_post_retire": null,
   "utility_multiplier_pre_retire": 1.0,
   "utility_multiplier_post_retire": 1.7,
-
   "monthly_spending_min": 1,
   "monthly_spending_max": 30000,
   "monthly_spending_step": 100,
