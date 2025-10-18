@@ -41,7 +41,6 @@ def simulate_with_retirement(
     utility_exponent_post_retire: Optional[float],
     utility_multiplier_pre_retire: float,
     utility_multiplier_post_retire: float,
-    minimum_spending_epsilon: float,
 ) -> Dict[str, float]:
     """
     Deterministic monthly simulation.
@@ -73,7 +72,7 @@ def simulate_with_retirement(
 
         # utility from spending (monthly)
         if gamma_now == 0:
-            monthly_utility = math.log(max(monthly_spending, minimum_spending_epsilon)) * age_factor * L_now
+            monthly_utility = math.log(monthly_spending) * age_factor * L_now
         else:
             monthly_utility = (monthly_spending**gamma_now) * age_factor * L_now
 
@@ -169,8 +168,11 @@ if __name__ == "__main__":
     with open("config.json", "r") as f:
         config = json.load(f)
 
+    if config["monthly_spending_min"] <= 0:
+        raise ValueError("monthly_spending_min must be positive to avoid log(0) in utility calculation")
+
     # Run the analysis for retirement ages and parameters as defined in config.json
-    ages = list(range(config["min_retire_age"], config["max_retire_age"]))
+    ages = list(range(config["retire_age_min"], config["retire_age_max"]))
     sim_kwargs = {
         "initial_age": config["initial_age"],
         "final_age": config["final_age"],
@@ -183,14 +185,13 @@ if __name__ == "__main__":
         "utility_exponent_post_retire": config["utility_exponent_post_retire"],
         "utility_multiplier_pre_retire": config["utility_multiplier_pre_retire"],
         "utility_multiplier_post_retire": config["utility_multiplier_post_retire"],
-        "minimum_spending_epsilon": config["minimum_spending_epsilon"],
     }
 
     df = run_grid_ages(
         ages=ages,
-        spend_min=config["spend_min"],
-        spend_max=config["spend_max"],
-        step=config["spend_step"],
+        spend_min=config["monthly_spending_min"],
+        spend_max=config["monthly_spending_max"],
+        step=config["monthly_spending_step"],
         sim_kwargs=sim_kwargs
     )
 

@@ -11,10 +11,10 @@
   "utility_exponent_post_retire": null,
   "utility_multiplier_pre_retire": 1.0,
   "utility_multiplier_post_retire": 1.7,
-  "spend_min": 0,
-  "spend_max": 30000,
-  "spend_step": 100,
-  "min_retire_age": 34,
-  "max_retire_age": 46,
-  "minimum_spending_epsilon": 1.0
+
+  "monthly_spending_min": 1,
+  "monthly_spending_max": 30000,
+  "monthly_spending_step": 100,
+  "retire_age_min": 34,
+  "retire_age_max": 46
 }
