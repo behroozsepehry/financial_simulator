@@ -193,6 +193,11 @@ if __name__ == "__main__":
         sim_kwargs=sim_kwargs
     )
 
+    # Normalize total_enjoyment to max 100, as integers
+    if not df.empty and df['total_enjoyment'].notna().any():
+        max_enjoy = df['total_enjoyment'].max()
+        df['total_enjoyment'] = (df['total_enjoyment'] / max_enjoy * 100).round().astype(int)
+
     # print nicely
     pd.set_option(
         "display.float_format", lambda x: f"{x:,.2f}" if pd.notnull(x) else "None"
