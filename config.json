@@ -4,12 +4,17 @@
   "initial_wealth": 500000.0,
   "initial_monthly_income": 8000.0,
   "income_annual_growth": 0.01,
-  "retire_age": 65.0,
   "retired_monthly_income": 0.0,
   "investment_annual_growth": 0.05,
   "monthly_spending": 3000.0,
   "utility_exponent_pre_retire": 0.0,
   "utility_exponent_post_retire": null,
   "utility_multiplier_pre_retire": 1.0,
-  "utility_multiplier_post_retire": 1.7
+  "utility_multiplier_post_retire": 1.7,
+  "spend_min": 0,
+  "spend_max": 30000,
+  "spend_step": 100,
+  "min_retire_age": 34,
+  "max_retire_age": 46,
+  "minimum_spending_epsilon": 1.0
 }

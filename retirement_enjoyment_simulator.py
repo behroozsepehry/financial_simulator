@@ -11,7 +11,7 @@ How the code is organized:
   returns total_enjoyment, final_wealth and bankruptcy flag.
 - max_feasible_spending_for_retire_age(...) -> constructs a discretized spending
   grid and uses bisect to find the highest grid point with final_wealth >= 0.
-- main block runs the search for ages 34..45 and prints a table.
+- main block runs the search for retirement ages as defined in config.json and prints a table.
 
 You can import the functions into an IDE and extend them (e.g., Monte Carlo, taxes,
 utility changes) as discussed in the project's TODO file.
@@ -37,10 +37,11 @@ def simulate_with_retirement(
     retired_monthly_income: float,
     investment_annual_growth: float,
     monthly_spending: float,
-    utility_exponent_pre_retire: float = 0.0,  # 0 -> log utility; else power utility with exponent utility_exponent_pre_retire
-    utility_exponent_post_retire: Optional[float] = None,
-    utility_multiplier_pre_retire: float = 1.0,
-    utility_multiplier_post_retire: float = 1.7,
+    utility_exponent_pre_retire: float,  # 0 -> log utility; else power utility with exponent utility_exponent_pre_retire
+    utility_exponent_post_retire: Optional[float],
+    utility_multiplier_pre_retire: float,
+    utility_multiplier_post_retire: float,
+    minimum_spending_epsilon: float,
 ) -> Dict[str, float]:
     """
     Deterministic monthly simulation.
@@ -72,7 +73,7 @@ def simulate_with_retirement(
 
         # utility from spending (monthly)
         if gamma_now == 0:
-            monthly_utility = math.log(max(monthly_spending, 1.0)) * age_factor * L_now
+            monthly_utility = math.log(max(monthly_spending, minimum_spending_epsilon)) * age_factor * L_now
         else:
             monthly_utility = (monthly_spending**gamma_now) * age_factor * L_now
 
@@ -92,9 +93,9 @@ def simulate_with_retirement(
 
 def max_feasible_spending_for_retire_age(
     retire_age: float,
-    spend_min: int = 0,
-    spend_max: int = 30_000,
-    step: int = 100,
+    spend_min: int,
+    spend_max: int,
+    step: int,
     **sim_kwargs,
 ) -> Tuple[Optional[float], Optional[float], Optional[float]]:
     """
@@ -132,16 +133,14 @@ def max_feasible_spending_for_retire_age(
 
 def run_grid_ages(
     ages: list,
-    spend_min: int = 0,
-    spend_max: int = 30_000,
-    step: int = 100,
-    sim_kwargs: dict = None,
+    spend_min: int,
+    spend_max: int,
+    step: int,
+    sim_kwargs: dict,
 ) -> pd.DataFrame:
     """
     Run max_feasible_spending_for_retire_age for multiple ages and return a DataFrame.
     """
-    if sim_kwargs is None:
-        sim_kwargs = {}
 
     rows = []
     for age in ages:
@@ -170,8 +169,8 @@ if __name__ == "__main__":
     with open("config.json", "r") as f:
         config = json.load(f)
 
-    # Default run: ages 34..45, step = 100 CAD, investment_annual_growth=5%, income_annual_growth=1%, utility_multiplier_post_retire=1.7
-    ages = list(range(34, 46))
+    # Run the analysis for retirement ages and parameters as defined in config.json
+    ages = list(range(config["min_retire_age"], config["max_retire_age"]))
     sim_kwargs = {
         "initial_age": config["initial_age"],
         "final_age": config["final_age"],
@@ -184,10 +183,15 @@ if __name__ == "__main__":
         "utility_exponent_post_retire": config["utility_exponent_post_retire"],
         "utility_multiplier_pre_retire": config["utility_multiplier_pre_retire"],
         "utility_multiplier_post_retire": config["utility_multiplier_post_retire"],
+        "minimum_spending_epsilon": config["minimum_spending_epsilon"],
     }
 
     df = run_grid_ages(
-        ages=ages, spend_min=0, spend_max=30_000, step=100, sim_kwargs=sim_kwargs
+        ages=ages,
+        spend_min=config["spend_min"],
+        spend_max=config["spend_max"],
+        step=config["spend_step"],
+        sim_kwargs=sim_kwargs
     )
 
     # print nicely
@@ -195,7 +199,3 @@ if __name__ == "__main__":
         "display.float_format", lambda x: f"{x:,.2f}" if pd.notnull(x) else "None"
     )
     print(df.to_string(index=False))
-
-    # save csv for inspection
-    df.to_csv("max_feasible_spending_by_age.csv", index=False)
-    print("\nSaved results to max_feasible_spending_by_age.csv")
