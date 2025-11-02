@@ -11,7 +11,5 @@
   "utility_multiplier_post_retire": 1.5,
   "monthly_spending_min": 100,
   "monthly_spending_max": 10000,
-  "monthly_spending_step": 10,
-  "retire_age_min": 25,
-  "retire_age_max": 80
+  "monthly_spending_step": 10
 }

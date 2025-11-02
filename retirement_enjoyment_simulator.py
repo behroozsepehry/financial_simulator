@@ -171,7 +171,7 @@ if __name__ == "__main__":
         raise ValueError("monthly_spending_min must be positive to avoid log(0) in utility calculation")
 
     # Run the analysis for retirement ages and parameters as defined in config.json
-    ages = list(range(config["retire_age_min"], config["retire_age_max"]))
+    ages = list(range(int(config["initial_age"]), int(config["final_age"]) + 1))
     sim_kwargs = {
         "initial_age": config["initial_age"],
         "final_age": config["final_age"],
